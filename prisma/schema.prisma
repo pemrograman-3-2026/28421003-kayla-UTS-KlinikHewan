@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  admin
+  dokter
+  pemilik
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique 
+  password String
+  role Role @default(pemilik)
+  no_telp String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  hewan Hewan[]  
+
+  @@map("users") 
+}
+
+model Hewan {
+  id Int @id @default(autoincrement())
+  nama String
+  spesies String   
+  umur Int      
+  pemilik_id Int      
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  pemilik User @relation(fields: [pemilik_id], references: [id])
+  rekamMedis RekamMedis[]
+
+  @@map("hewan")
+}
+
+model RekamMedis {
+  id Int @id @default(autoincrement())
+  hewan_id Int      
+  keluhan String   
+  diagnosis String?  
+  resep_obat String?
+  tanggal DateTime @default(now())
+  hewan Hewan @relation(fields: [hewan_id], references: [id])
+
+  @@map("rekam_medis")
+}
