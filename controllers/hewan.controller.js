@@ -7,20 +7,44 @@ export const createHewan = async (req, res) => {
         data: {
             nama: body.nama,
             spesies: body.spesies,
-            umur: parseInt(body.umur),
-            pemilik_id: parseInt(body.pemilik_id)
+            umur: Number(body.umur),
+            pemilik_id: Number(body.pemilik_id)
         }
     })
 
     res.json({
-        message: 'Hewan created successfully'
+        message: 'Hewan was created'
+    })
+}
+
+export const updateHewan = async (req, res) => {
+    const body = req.body
+
+    let data = {
+        nama: body.nama,
+        spesies: body.spesies,
+        umur: Number(body.umur),
+        pemilik_id: Number(body.pemilik_id)
+    }
+
+    await prisma.hewan.update({
+        where: {
+            id: Number(req.params.id)
+        },
+        data
+    })
+
+    res.json({
+        message: 'Hewan was updated'
     })
 }
 
 export const getAllHewan = async (req, res) => {
-    const hewan = await prisma.hewan.findMany()
-    
-    res.json({
-        data: hewan
+    const data = await prisma.hewan.findMany({
+        include: {
+            pemilik: true
+        }
     })
+
+    res.json(data)
 }

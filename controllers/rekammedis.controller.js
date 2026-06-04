@@ -5,7 +5,7 @@ export const createRekamMedis = async (req, res) => {
 
     await prisma.rekamMedis.create({
         data: {
-            hewan_id: parseInt(body.hewan_id),
+            hewan_id: Number(body.hewan_id),
             keluhan: body.keluhan,
             diagnosis: body.diagnosis,
             resep_obat: body.resep_obat
@@ -13,14 +13,38 @@ export const createRekamMedis = async (req, res) => {
     })
 
     res.json({
-        message: 'Rekam Medis created successfully'
+        message: 'Rekam Medis was created'
+    })
+}
+
+export const updateRekamMedis = async (req, res) => {
+    const body = req.body
+
+    let data = {
+        hewan_id: Number(body.hewan_id),
+        keluhan: body.keluhan,
+        diagnosis: body.diagnosis,
+        resep_obat: body.resep_obat
+    }
+
+    await prisma.rekamMedis.update({
+        where: {
+            id: Number(req.params.id)
+        },
+        data
+    })
+
+    res.json({
+        message: 'Rekam Medis was updated'
     })
 }
 
 export const getAllRekamMedis = async (req, res) => {
-    const rekamMedis = await prisma.rekamMedis.findMany()
-    
-    res.json({
-        data: rekamMedis
+    const data = await prisma.rekamMedis.findMany({
+        include: {
+            hewan: true
+        }
     })
+
+    res.json(data)
 }
