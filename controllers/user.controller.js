@@ -15,7 +15,7 @@ export const register = async (req, res) => {
 
     if (isUsernameExist) {
         return res.status(400).json({
-            message:'Username already exist'
+            message: 'Username already exist'
         })
     }
 
@@ -28,7 +28,7 @@ export const register = async (req, res) => {
         }
     })
 
-    res.json({
+    return res.json({
         message: 'Register Successfully'
     })
 }
@@ -52,13 +52,28 @@ export const login = async (req, res) => {
 
     const hashPassword = isUsernameExist.password
 
-    if(!bcrypt.compareSync(password, hashPassword)) {
+    if (!bcrypt.compareSync(password, hashPassword)) {
         return res.status(401).json({
             message: 'Incorrect Password'
         })
     }
 
-    res.json({
+    const dataSession = JSON.stringify({
+        id: isUsernameExist.id,
+        username,
+        no_telp: isUsernameExist.no_telp,
+        role: isUsernameExist.role
+    })
+
+    res.cookie('user', dataSession, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    })
+
+    return res.json({
         message: 'Login Successfully',
         data: {
             username: isUsernameExist.username,
@@ -71,7 +86,19 @@ export const login = async (req, res) => {
 export const getAllUsers = async (req, res) => {
     const users = await prisma.user.findMany()
     
-    res.json({
-        data: users
-    })
+    res.json(users) 
+}
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.user.delete({
+            where: {
+                id: Number(id)
+            }
+        });
+        res.json({ message: "User berhasil dihapus" });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal menghapus user" });
+    }
 }

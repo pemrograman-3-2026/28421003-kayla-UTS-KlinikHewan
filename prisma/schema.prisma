@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -14,45 +14,44 @@ datasource db {
 
 enum Role {
   admin
-  dokter
-  pemilik
+  user
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String @unique 
-  password String
-  role Role @default(pemilik)
-  no_telp String
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  role       Role     @default(user)
+  no_telp    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  hewan Hewan[]  
+  hewan      Hewan[]
 
-  @@map("users") 
+  @@map("users")
 }
 
 model Hewan {
-  id Int @id @default(autoincrement())
-  nama String
-  spesies String   
-  umur Int      
-  pemilik_id Int      
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  pemilik User @relation(fields: [pemilik_id], references: [id])
+  id         Int          @id @default(autoincrement())
+  nama       String
+  spesies    String
+  umur       Int
+  pemilik_id Int
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  pemilik    User         @relation(fields: [pemilik_id], references: [id], onDelete: Cascade)
   rekamMedis RekamMedis[]
 
   @@map("hewan")
 }
 
 model RekamMedis {
-  id Int @id @default(autoincrement())
-  hewan_id Int      
-  keluhan String   
-  diagnosis String?  
+  id         Int      @id @default(autoincrement())
+  hewan_id   Int
+  keluhan    String
+  diagnosis  String?
   resep_obat String?
-  tanggal DateTime @default(now())
-  hewan Hewan @relation(fields: [hewan_id], references: [id])
+  tanggal    DateTime @default(now())
+  hewan      Hewan    @relation(fields: [hewan_id], references: [id], onDelete: Cascade)
 
   @@map("rekam_medis")
 }
